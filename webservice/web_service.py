@@ -19,6 +19,12 @@ class WebService:
 
     def get_request_json(self) -> str:
         resp = requests.get(self.url, timeout=5)
+        print(resp.text)
         json_string = resp.text
         x: Data = json.loads(json_string, object_hook=custom_data_decoder)
         return x.data.JSON_OUT
+
+    def put_request_json(self, dictionary: dict):
+        resp = requests.put(self.url, json=dictionary, timeout=5)
+        print(resp.text)
+        json_string = resp.text

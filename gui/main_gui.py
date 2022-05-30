@@ -1,6 +1,6 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-from gui.edition_gui import EditionGui
+from gui.manage_empresas_gui import EmpresasGui
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("../assets")
@@ -48,31 +48,31 @@ class MainGui:
 
     def cargar_ventana_empresa(self):
         self.window.destroy()
-        EditionGui("EMPRESA").iniciar_ventana()
+        EmpresasGui().iniciar_ventana()
 
     def cargar_ventana_persona(self):
         self.window.destroy()
-        EditionGui("PERSONA").iniciar_ventana()
+        # TODO VENTANA DE EDICION
 
     def cargar_ventana_sexo(self):
         self.window.destroy()
-        EditionGui("SEXO").iniciar_ventana()
+        # TODO VENTANA DE EDICION
 
     def cargar_ventana_experiencia(self):
         self.window.destroy()
-        EditionGui("EXPERIENCIA").iniciar_ventana()
+        # TODO VENTANA DE EDICION
 
     def cargar_venana_emoji(self):
         self.window.destroy()
-        EditionGui("EMOJI").iniciar_ventana()
+        # TODO VENTANA DE EDICION
 
     def cargar_ventana_log(self):
         self.window.destroy()
-        EditionGui("LOG").iniciar_ventana()
+        # TODO VENTANA DE EDICION
 
     def cargar_ventana_opinion(self):
         self.window.destroy()
-        EditionGui("OPINION").iniciar_ventana()
+        # TODO VENTANA DE EDICION
 
     def iniciar_ventana(self):
         self.window.mainloop()
