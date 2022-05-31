@@ -89,6 +89,7 @@ class EmpresasGui:
         ttk.Label(self.scrollable_frame, text="Correo", font=self.font).grid(row=0, column=3, padx=10, pady=10)
         ttk.Label(self.scrollable_frame, text="Nick", font=self.font).grid(row=0, column=4, padx=10, pady=10)
         ttk.Label(self.scrollable_frame, text="Nombre Empresa", font=self.font).grid(row=0, column=5, padx=10, pady=10)
+        ttk.Label(self.scrollable_frame, text="LBorrado", font=self.font).grid(row=0, column=6, padx=10, pady=10)
 
         # Pinto las empresas junto a sus opciones en el scroll
         for i in range(len(self.empresas)):
@@ -117,29 +118,51 @@ class EmpresasGui:
 
             # pinto el resto de sus atributos
             try:
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Id, font=self.font).grid(row=i + 1, column=2, padx=10,
-                                                                                      pady=10)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Correo, font=self.font).grid(row=i + 1, column=3, padx=10,
-                                                                                          pady=10)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nick, font=self.font).grid(row=i + 1, column=4, padx=10,
-                                                                                        pady=10)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nombre_Empresa, font=self.font).grid(row=i + 1, column=5,
-                                                                                                  padx=10, pady=10)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Id, font=self.font).grid(row=i + 1, column=2,
+                                                                                                padx=10,
+                                                                                                pady=10)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Correo, font=self.font).grid(row=i + 1, column=3,
+                                                                                                    padx=10,
+                                                                                                    pady=10)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nick, font=self.font).grid(row=i + 1, column=4,
+                                                                                                  padx=10,
+                                                                                                  pady=10)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nombre_Empresa, font=self.font).grid(row=i + 1,
+                                                                                                            column=5,
+                                                                                                            padx=10,
+                                                                                                            pady=10)
             except AttributeError:
                 ttk.Label(self.scrollable_frame, text="").grid(row=i + 1, column=5, padx=10, pady=10)
 
             # Seteo sus botones:
-            ttk.Button(self.scrollable_frame, text="Editar").grid(row=i + 1, column=6, padx=10, pady=10)
+            editar_empresa = ttk.Button(self.scrollable_frame, text="Editar")
+            editar_empresa.grid(row=i + 1, column=7, padx=10, pady=10)
+            editar_empresa.config(command=lambda iterador=i: {
+
+            })
+
+            boton_borrar_logicamente = ttk.Button(self.scrollable_frame, text="LEliminar")
+            boton_borrar_logicamente.grid(row=i + 1, column=8, padx=10, pady=10)
+            boton_borrar_logicamente.config(command=lambda iterador=i: {
+                self.eliminar_empresa(iterador)
+            })
 
             boton_borrar = ttk.Button(self.scrollable_frame, text="Eliminar")
-            boton_borrar.grid(row=i + 1, column=7, padx=10, pady=10)
+            boton_borrar.grid(row=i + 1, column=9, padx=10, pady=10)
             boton_borrar.config(command=lambda iterador=i: {
-                self.eliminar_empresa(iterador)
+                self.eliminar_empresa_real(iterador)
             })
 
     def eliminar_empresa(self, iterador):
         if messagebox.askyesno("Eliminar empresa", "¿Esta seguro que desea eliminar la empresa lógicamente? Esto afectará en cascada a los elementos que la componen..."):
-            # wse.delete_empresa_by_id_logic(self.empresas[iterador].Id)
+            # TODO wse.delete_empresa_by_id_logic(self.empresas[iterador].Id)
+            self.empresas.pop(iterador)
+            messagebox.showinfo("Eliminar empresa", "La empresa ha sido eliminada correctamente.")
+            self.actualizar_lista()
+
+    def eliminar_empresa_real(self, iterador):
+        if messagebox.askyesno("Eliminar empresa", "¿Esta seguro que desea eliminar la empresa realmente? Esto afectará en cascada a los elementos que la componen..."):
+            # TODO wse.delete_empresa_by_id(self.empresas[iterador].Id)
             self.empresas.pop(iterador)
             messagebox.showinfo("Eliminar empresa", "La empresa ha sido eliminada correctamente.")
             self.actualizar_lista()

@@ -45,6 +45,5 @@ class UpdateInsertEmpresa:
         # Nombre de la empresa
         ttk.Label(self.ventana, text="Nombre: ", font=self.font).grid(row=5, column=0, sticky="nsew")
 
-
     def iniciar_ventana(self):
         self.ventana.mainloop()

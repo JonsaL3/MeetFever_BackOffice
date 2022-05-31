@@ -28,3 +28,9 @@ class WebService:
         resp = requests.put(self.url, json=dictionary, timeout=5)
         print(resp.text)
         json_string = resp.text
+
+    def post_request_json(self, dictionary: dict):
+        resp = requests.post(self.url, json=dictionary, timeout=5)
+        print(resp.text)
+        json_string = resp.text
+        return
