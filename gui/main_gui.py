@@ -1,6 +1,6 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-from gui.manage_empresas_gui import EmpresasGui
+from tkinter import Tk, Canvas, Button, PhotoImage
+from gui.empresa_gui.manage_empresas_gui import EmpresasGui
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("../assets")
@@ -19,6 +19,7 @@ class MainGui:
         self.window.geometry("1280x720")
         self.window.configure(bg="#F4F4F4")
         self.window.resizable(False, False)
+        self.center()
 
         # Elementos que la componen
         self.button_image_9 = None
@@ -45,6 +46,18 @@ class MainGui:
 
         # inicializo esos elementos
         self.load_ui()
+
+    def center(self):
+        self.window.update_idletasks()
+        width = self.window.winfo_width()
+        frm_width = self.window.winfo_rootx() - self.window.winfo_x()
+        win_width = width + 2 * frm_width
+        height = self.window.winfo_height()
+        titlebar_height = self.window.winfo_rooty() - self.window.winfo_y()
+        win_height = height + titlebar_height + frm_width
+        x = self.window.winfo_screenwidth() // 2 - win_width // 2
+        y = self.window.winfo_screenheight() // 2 - win_height // 2
+        self.window.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
     def cargar_ventana_empresa(self):
         self.window.destroy()
