@@ -1,16 +1,14 @@
 import binascii
 import tkinter as tk
-
 import PIL
-import webservice.web_service_persona as wsp
+import webservice.web_service_experiencia as wse
 import base64
 
 from io import BytesIO
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
-
-from gui.persona_gui.update_insert_personas import UpdateInsertPersona
-from model.Persona import Persona
+from model.Experiencia import Experiencia
+from gui.experiencia_gui.update_insert_experiencias import UpdateInsertExperiencias
 
 
 class ExperienciasGui:
@@ -18,20 +16,20 @@ class ExperienciasGui:
     def __init__(self):
         # La ventana en si
         self.ventana = tk.Tk()
-        self.ventana.title("Administrar personas")
-        self.ventana.geometry("1280x720")
-        self.ventana.resizable(False, False)
+        self.ventana.title("Administrar experiencias")
+        self.ventana.geometry("1240x720")
         self.center()
+        self.ventana.resizable(False, False)
+        self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)
 
         # Fuente
         self.font = ("Montserrat Light", 12)
 
         # Lista de empresas
-        self.personas = None
+        self.experiencias = None
 
         # Elementos internos que en cualquier lenguaje normal serían prescindibles
-        self.lista_foto_perfil = None
-        self.lista_foto_fondo = None
+        self.lista_fotos_experiencia = None
         self.base64_string = None
         self.image = None
 
@@ -45,6 +43,11 @@ class ExperienciasGui:
         # inicializo esos elementos
         self.cargar_widgets()
 
+    def volver_a_menu(self):
+        from gui.main_gui import MainGui
+        self.ventana.destroy()
+        MainGui().iniciar_ventana()
+
     def center(self):
         self.ventana.update_idletasks()
         width = self.ventana.winfo_width()
@@ -57,13 +60,12 @@ class ExperienciasGui:
         y = self.ventana.winfo_screenheight() // 2 - win_height // 2
         self.ventana.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
-    def obtener_personas_actualizadas(self):
-        self.personas: list[Persona] = wsp.get_all_personas()
-        self.personas.sort(key=lambda x: x.Id)
+    def obtener_experiencias_actualizadas(self):
+        self.experiencias: list[Experiencia] = wse.get_all_experiencias()
+        self.experiencias.sort(key=lambda x: x.Id)
 
     def cargar_widgets(self):
-        ttk.Button(self.ventana, text="Agregar persona", command=lambda: self.editar_persona(None)).pack(side=tk.TOP,
-                                                                                                         fill=tk.X)
+        ttk.Button(self.ventana, text="Agregar experiencia", command=lambda: self.editar_persona(None)).pack(side=tk.TOP, fill=tk.X)
 
         # Creo un conenedor con scroll
         self.contenedor = ttk.Frame(self.ventana)
@@ -81,7 +83,7 @@ class ExperienciasGui:
         self.canvas.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
 
         # Muestro la lista de empresas en el frame que me he preparado con gird
-        self.obtener_personas_actualizadas()
+        self.obtener_experiencias_actualizadas()
         self.pintar_lista_de_personas()
 
         # Pinto t.odo en el contenedor
@@ -96,121 +98,106 @@ class ExperienciasGui:
 
     def pintar_lista_de_personas(self):
 
-        self.lista_foto_perfil = []
-        self.lista_foto_fondo = []
+        self.lista_fotos_experiencia = []
 
         # Muestro el nombre de los campos mostrados
-        ttk.Label(self.scrollable_frame, text="Foto Perfil", font=self.font).grid(row=0, column=0, padx=5, pady=5)
-        ttk.Label(self.scrollable_frame, text="Foto Fondo", font=self.font).grid(row=0, column=1, padx=5, pady=5)
-        ttk.Label(self.scrollable_frame, text="Id", font=self.font).grid(row=0, column=2, padx=5, pady=5)
-        ttk.Label(self.scrollable_frame, text="Correo", font=self.font).grid(row=0, column=3, padx=5, pady=5)
-        ttk.Label(self.scrollable_frame, text="Nick", font=self.font).grid(row=0, column=4, padx=5, pady=5)
-        ttk.Label(self.scrollable_frame, text="Activo", font=self.font).grid(row=0, column=5, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Imagen experiencia", font=self.font).grid(row=0, column=0, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Id", font=self.font).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Titulo", font=self.font).grid(row=0, column=2, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Descripción", font=self.font).grid(row=0, column=3, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Fecha", font=self.font).grid(row=0, column=4, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Precio", font=self.font).grid(row=0, column=5, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Aforo", font=self.font).grid(row=0, column=6, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Activo", font=self.font).grid(row=0, column=7, padx=5, pady=5)
 
         # Pinto las empresas junto a sus opciones en el scroll
-        for i in range(len(self.personas)):
+        for i in range(len(self.experiencias)):
 
             # Obtengo la foto de perfil
             try:
-                self.base64_string = self.personas[i].Foto_Perfil
+                self.base64_string = self.experiencias[i].Foto_Perfil
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
-                self.lista_foto_perfil.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_foto_perfil[i]) \
-                    .grid(column=0, row=i + 1, padx=5, pady=5)
+                self.lista_fotos_experiencia.append(ImageTk.PhotoImage(self.image))
+                ttk.Label(self.scrollable_frame, image=self.lista_fotos_experiencia[i]).grid(column=0, row=i + 1, padx=5, pady=5)
             except binascii.Error:
                 print("No se pudo cargar la imagen de perfil")
-                self.lista_foto_fondo.append(None)
+                self.lista_fotos_experiencia.append(None)
             except PIL.UnidentifiedImageError:
                 print("No se pudo cargar la imagen de perfil")
-                self.lista_foto_perfil.append(None)
+                self.lista_fotos_experiencia.append(None)
             except AttributeError:
                 print("No se pudo cargar la imagen de perfil")
-                self.lista_foto_perfil.append(None)
-
-            # Obtengo la foto de fondo
-            try:
-                self.base64_string = self.personas[i].Foto_Fondo
-                self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
-                self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
-                self.lista_foto_fondo.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_foto_fondo[i]) \
-                    .grid(column=1, row=i + 1, padx=5, pady=5)
-            except binascii.Error:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
-            except PIL.UnidentifiedImageError:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
-            except AttributeError:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
+                self.lista_fotos_experiencia.append(None)
 
             # pinto el resto de sus atributos
             try:
-                ttk.Label(self.scrollable_frame, text=self.personas[i].Id, font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.personas[i].Correo[0:20], font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.personas[i].Nick[0:20], font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
-                if self.personas[i].Eliminado:
-                    ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Id, font=self.font).grid(row=i + 1, column=1, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Titulo[0:20], font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Descripcion[0:20], font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Fecha_Celebracion, font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Precio, font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Aforo, font=self.font).grid(row=i + 1, column=6, padx=5, pady=5)
+                if self.experiencias[i].Eliminado:
+                    ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=7, padx=5, pady=5)
                 else:
-                    ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
+                    ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=7, padx=5, pady=5)
 
             except AttributeError:
                 print("No se pudo cargar el resto de los atributos")
 
             # Seteo sus botones:
             editar_empresa = ttk.Button(self.scrollable_frame, text="Editar")
-            editar_empresa.grid(row=i + 1, column=6, padx=5, pady=5)
+            editar_empresa.grid(row=i + 1, column=8, padx=5, pady=5)
             editar_empresa.config(command=lambda iterador=i: {
-                self.editar_persona(self.personas[iterador])
+                self.editar_persona(self.experiencias[iterador])
             })
 
             boton_borrar_logicamente = ttk.Button(self.scrollable_frame, text="Activar/Desactivar")
-            boton_borrar_logicamente.grid(row=i + 1, column=7, padx=5, pady=5)
+            boton_borrar_logicamente.grid(row=i + 1, column=9, padx=5, pady=5)
             boton_borrar_logicamente.config(command=lambda iterador=i: {
                 self.activar_desactivar_persona(iterador)
             })
 
             boton_borrar = ttk.Button(self.scrollable_frame, text="Eliminar")
-            boton_borrar.grid(row=i + 1, column=8, padx=5, pady=5)
+            boton_borrar.grid(row=i + 1, column=10, padx=5, pady=5)
             boton_borrar.config(command=lambda iterador=i: {
                 self.eliminar_persona_real(iterador)
             })
 
     def editar_persona(self, persona):
         self.ventana.destroy()
-        UpdateInsertPersona(persona).iniciar_ventana()
+        UpdateInsertExperiencias(persona).iniciar_ventana()
 
     def activar_desactivar_persona(self, iterador):
 
-        if self.personas[iterador].Eliminado == 0:
-            if messagebox.askyesno("Desactivar persona", "¿Esta seguro que desea desactivar la persona lógicamente? Esto afectará en cascada a los elementos que la componen..."):
-                if wsp.delete_persona_by_id_logic(self.personas[iterador].Id):
-                    messagebox.showinfo("Desactivar persona", "La persona ha sido desactivada correctamente.")
+        if self.experiencias[iterador].Eliminado == 0:
+            if messagebox.askyesno("Desactivar experiencia", "¿Esta seguro que desea desactivar la experiencia lógicamente? Esto afectará en cascada a los elementos que la componen..."):
+                if wse.delete_experiencia_by_id_logic(self.experiencias[iterador].Id):
+                    messagebox.showinfo("Desactivar experiencia", "La experiencia ha sido desactivada correctamente.")
                     self.actualizar_lista()
                 else:
-                    messagebox.showerror("Desactivar persona", "No se pudo desactivar la persona.")
+                    messagebox.showerror("Desactivar experiencia", "No se pudo desactivar la experiencia.")
         else:
-            if messagebox.askyesno("Activar persona", "¿Esta seguro que desea activar la persona lógicamente? Esto afectará en cascada a los elementos que la componen..."):
-                if wsp.reactivar_persona_by_id_logic(self.personas[iterador].Id):
+            if messagebox.askyesno("Activar experiencia", "¿Esta seguro que desea activar la experiencia lógicamente? Esto afectará en cascada a los elementos que la componen..."):
+                if wse.reactivar_experiencia_by_id(self.experiencias[iterador].Id):
                     self.actualizar_lista()
-                    messagebox.showinfo("Activar persona", "La persona ha sido activada correctamente.")
+                    messagebox.showinfo("Activar experiencia", "La experiencia ha sido activada correctamente.")
                     self.actualizar_lista()
                 else:
-                    messagebox.showerror("Activar persona", "No se pudo activar la persona.")
+                    messagebox.showerror("Activar experiencia", "No se pudo activar la experiencia.")
 
     def eliminar_persona_real(self, iterador):
-        if messagebox.askyesno("Eliminar persona", "¿Esta seguro que desea eliminar la persona realmente? Esto afectará en cascada a los elementos que la componen..."):
-            if wsp.delete_persona_by_id(self.personas[iterador].Id):
-                self.personas.pop(iterador)
-                messagebox.showinfo("Eliminar persona", "La persona ha sido eliminada correctamente.")
+        if messagebox.askyesno("Eliminar experiencia", "¿Esta seguro que desea eliminar la experiencia realmente? Esto afectará en cascada a los elementos que la componen..."):
+            if wse.delete_experiencia_by_id(self.experiencias[iterador].Id):
+                self.experiencias.pop(iterador)
+                messagebox.showinfo("Eliminar experiencia", "La experiencia ha sido eliminada correctamente.")
                 self.actualizar_lista()
             else:
-                messagebox.showerror("Eliminar persona", "No se pudo eliminar la persona.")
+                messagebox.showerror("Eliminar experiencia", "No se pudo eliminar la experiencia.")
 
     def actualizar_lista(self):
-        self.obtener_personas_actualizadas()
+        self.obtener_experiencias_actualizadas()
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
         self.pintar_lista_de_personas()

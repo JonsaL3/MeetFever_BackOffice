@@ -11,6 +11,9 @@ from model.Empresa import Empresa
 from PIL import Image, ImageTk
 from gui.empresa_gui.update_insert_empresas import UpdateInsertEmpresa
 
+foto_empresa_por_defecto = Image.open("assets/default_enterprise.png")
+foto_empresa_por_defecto = foto_empresa_por_defecto.resize((200, 200), PIL.Image.ANTIALIAS)
+
 
 class EmpresasGui:
 
@@ -18,9 +21,10 @@ class EmpresasGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar empresas")
-        self.ventana.geometry("1280x720")
-        self.ventana.resizable(False, False)
+        self.ventana.geometry("1170x720")
         self.center()
+        self.ventana.resizable(False, False)
+        self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)
 
         # Fuente
         self.font = ("Montserrat Light", 12)
@@ -44,6 +48,11 @@ class EmpresasGui:
         # inicializo esos elementos
         self.cargar_widgets()
 
+    def volver_a_menu(self):
+        from gui.main_gui import MainGui
+        self.ventana.destroy()
+        MainGui().iniciar_ventana()
+
     def center(self):
         self.ventana.update_idletasks()
         width = self.ventana.winfo_width()
@@ -61,12 +70,12 @@ class EmpresasGui:
         self.empresas.sort(key=lambda x: x.Id)
 
     def cargar_widgets(self):
-        ttk.Button(self.ventana, text="Agregar empresa", command=lambda : self.editar_empresa(None)).pack(side=tk.TOP, fill=tk.X)
+        ttk.Button(self.ventana, text="Agregar empresa", command=lambda: self.editar_empresa(None)).pack(side=tk.TOP,
+                                                                                                         fill=tk.X)
 
         # Creo un conenedor con scroll
         self.contenedor = ttk.Frame(self.ventana)
         self.canvas = tk.Canvas(self.contenedor)
-        self.xscrollbar = ttk.Scrollbar(self.contenedor, orient="horizontal", command=self.canvas.xview)
         self.yscrollbar = ttk.Scrollbar(self.contenedor, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = ttk.Frame(self.canvas)
         self.scrollable_frame.bind(
@@ -76,20 +85,18 @@ class EmpresasGui:
             )
         )
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        self.canvas.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
+        self.canvas.configure(yscrollcommand=self.yscrollbar.set)
 
         # Muestro la lista de empresas en el frame que me he preparado con gird
         self.obtener_empresas_actualizadas()
         self.pintar_lista_de_empresas()
 
         # Pinto t.odo en el contenedor
-        self.xscrollbar.pack(side="bottom", fill="x")
         self.yscrollbar.pack(side="right", fill="y")
         self.contenedor.pack(expand=True, fill="both")
         self.canvas.pack(fill="both", expand=True)
 
         # las scrollbars deben verse en el mismo orden que el contenedor
-        self.xscrollbar.config(command=self.canvas.xview)
         self.yscrollbar.config(command=self.canvas.yview)
 
     def pintar_lista_de_empresas(self):
@@ -109,19 +116,19 @@ class EmpresasGui:
         # Pinto las empresas junto a sus opciones en el scroll
         for i in range(len(self.empresas)):
 
+            row = tk.Frame(self.scrollable_frame)
+            row.grid(row=i + 1, column=0, columnspan=7, sticky="nsew")
+
             # Obtengo la foto de perfil
             try:
                 self.base64_string = self.empresas[i].Foto_Perfil
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_foto_perfil.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_foto_perfil[i]) \
-                    .grid(column=0, row=i + 1, padx=5, pady=5)
+                ttk.Label(row, image=self.lista_foto_perfil[i]).grid(column=0, row=i + 1, padx=5, pady=5)
             except binascii.Error:
-                print("No se pudo cargar la imagen de perfil")
                 self.lista_foto_fondo.append(None)
             except PIL.UnidentifiedImageError:
-                print("No se pudo cargar la imagen de perfil")
                 self.lista_foto_perfil.append(None)
 
             # Obtengo la foto de fondo
@@ -130,33 +137,24 @@ class EmpresasGui:
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_foto_fondo.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_foto_fondo[i]) \
-                    .grid(column=1, row=i + 1, padx=5, pady=5)
+                ttk.Label(row, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
             except binascii.Error:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
+                self.lista_foto_fondo.append(foto_empresa_por_defecto)
+                ttk.Label(row, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
             except PIL.UnidentifiedImageError:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
+                self.lista_foto_fondo.append(foto_empresa_por_defecto)
+                ttk.Label(row, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
 
             # pinto el resto de sus atributos
             try:
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Id, font=self.font).grid(row=i + 1, column=2,
-                                                                                                padx=5,
-                                                                                                pady=5)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Correo[0:20], font=self.font).grid(row=i + 1, column=3,
-                                                                                                    padx=5,
-                                                                                                    pady=5)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nick[0:20], font=self.font).grid(row=i + 1, column=4,
-                                                                                                  padx=5,
-                                                                                                  pady=5)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nombre_Empresa[0:20], font=self.font).grid(row=i + 1,
-                                                                                                            column=5,
-                                                                                                            padx=5,
-                                                                                                            pady=5)
+                # cada columna de la lista será de un color distinto
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Id, font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Correo[0:20], font=self.font).grid(row=i + 1, column=3,padx=5,pady=5)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nick[0:20], font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nombre_Empresa[0:20], font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
 
                 if self.empresas[i].Eliminado == 0:
-                    ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=6, padx=5, pady=5)
+                    ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=6, padx=5,pady=5)
                 else:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=6, padx=5, pady=5)
 

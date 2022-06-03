@@ -19,9 +19,10 @@ class PersonasGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar personas")
-        self.ventana.geometry("1280x720")
-        self.ventana.resizable(False, False)
+        self.ventana.geometry("1010x720")
         self.center()
+        self.ventana.resizable(False, False)
+        self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)
 
         # Fuente
         self.font = ("Montserrat Light", 12)
@@ -44,6 +45,11 @@ class PersonasGui:
 
         # inicializo esos elementos
         self.cargar_widgets()
+
+    def volver_a_menu(self):
+        from gui.main_gui import MainGui
+        self.ventana.destroy()
+        MainGui().iniciar_ventana()
 
     def center(self):
         self.ventana.update_idletasks()

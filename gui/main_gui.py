@@ -1,6 +1,13 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
+
 from gui.empresa_gui.manage_empresas_gui import EmpresasGui
+from gui.persona_gui.manage_personas_gui import PersonasGui
+from gui.opinion_gui.manage_opiniones_gui import OpinionesGui
+from gui.experiencia_gui.manage_experiencias_gui import ExperienciasGui
+from gui.emoji_gui.manage_emojis_gui import EmojisGui
+from gui.sexo_gui.manage_sexos import SexosGui
+from gui.log_gui.manage_logs import LogsGui
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("../assets")
@@ -17,9 +24,9 @@ class MainGui:
         # La ventana en si
         self.window = Tk()
         self.window.geometry("1280x720")
+        self.center()
         self.window.configure(bg="#F4F4F4")
         self.window.resizable(False, False)
-        self.center()
 
         # Elementos que la componen
         self.button_image_9 = None
@@ -65,30 +72,38 @@ class MainGui:
 
     def cargar_ventana_persona(self):
         self.window.destroy()
-        # TODO VENTANA DE EDICION
+        PersonasGui().iniciar_ventana()
 
     def cargar_ventana_sexo(self):
         self.window.destroy()
-        # TODO VENTANA DE EDICION
+        SexosGui().iniciar_ventana()
 
     def cargar_ventana_experiencia(self):
         self.window.destroy()
-        # TODO VENTANA DE EDICION
+        ExperienciasGui().iniciar_ventana()
 
     def cargar_venana_emoji(self):
         self.window.destroy()
-        # TODO VENTANA DE EDICION
+        EmojisGui().iniciar_ventana()
 
     def cargar_ventana_log(self):
         self.window.destroy()
-        # TODO VENTANA DE EDICION
+        LogsGui().iniciar_ventana()
 
     def cargar_ventana_opinion(self):
         self.window.destroy()
-        # TODO VENTANA DE EDICION
+        OpinionesGui().iniciar_ventana()
 
     def iniciar_ventana(self):
         self.window.mainloop()
+
+    def cerrar_sesion(self):
+        self.window.destroy()
+        from gui.login_gui import LoginGui
+        LoginGui().iniciar_ventana()
+
+    def salir(self):
+        self.window.destroy()
 
     def load_ui(self):
         self.canvas = Canvas(
@@ -164,7 +179,7 @@ class MainGui:
             image=self.button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.cargar_venana_emoji(),
+            command=lambda: self.cargar_ventana_experiencia(),
             relief="flat"
         )
         self.button_4.place(
@@ -180,7 +195,7 @@ class MainGui:
             image=self.button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.cargar_ventana_experiencia(),
+            command=lambda: self.cargar_venana_emoji(),
             relief="flat"
         )
         self.button_5.place(
@@ -228,7 +243,7 @@ class MainGui:
             image=self.button_image_8,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_8 clicked"),
+            command=lambda: self.salir(),
             relief="flat"
         )
         self.button_8.place(
@@ -244,7 +259,7 @@ class MainGui:
             image=self.button_image_9,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_9 clicked"),
+            command=lambda: self.cerrar_sesion(),
             relief="flat"
         )
         self.button_9.place(

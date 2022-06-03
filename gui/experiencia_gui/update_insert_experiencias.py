@@ -1,35 +1,28 @@
 import tkinter as tk
-import webservice.web_service_persona as wsp
+import webservice.web_service_experiencia as wse
 
 from tkinter import ttk, messagebox
-from model.Persona import Persona
-from model.Sexo import Sexo
+from model.Experiencia import Experiencia
 
 
-class UpdateInsertPersona:
+class UpdateInsertExperiencias:
 
-    def __init__(self, persona: Persona):
+    def __init__(self, experiencia: Experiencia):
         # La ventana en si
         self.ventana = tk.Tk()
-        self.ventana.title("Actualizar/Insertar persona.")
+        self.ventana.title("Actualizar/Insertar experiencia.")
         self.ventana.protocol("WM_DELETE_WINDOW", self.cerrar_ventana_preguntando)
 
         # Datos que necesito
-        self.persona = persona
+        self.experiencia = experiencia
         self.Id = tk.StringVar(self.ventana)
-        self.Correo = tk.StringVar(self.ventana)
-        self.Contrasena = tk.StringVar(self.ventana)
-        self.Nick = tk.StringVar(self.ventana)
-        self.Telefono = tk.StringVar(self.ventana)
-        self.Frase = tk.StringVar(self.ventana)
-        # TODO FOTO PERFIL
-        # TODO FOTO FONDO
-        self.Dni = tk.StringVar(self.ventana)
-        self.Nombre = tk.StringVar(self.ventana)
-        self.Apellido1 = tk.StringVar(self.ventana)
-        self.Apellido2 = tk.StringVar(self.ventana)
-        # TODO SEXO
-        self.Fecha_Nacimiento = tk.StringVar(self.ventana)
+        self.Titulo = tk.StringVar(self.ventana)
+        self.Descripcion = tk.StringVar(self.ventana)
+        self.Fecha_Celebracion = tk.StringVar(self.ventana)
+        self.Precio = tk.StringVar(self.ventana)
+        self.Aforo = tk.StringVar(self.ventana)
+        self.Foto = tk.StringVar(self.ventana)
+        self.Id_Empresa = tk.StringVar(self.ventana)
 
         # Fuente
         self.font = ("Montserrat Light", 12)
@@ -39,93 +32,63 @@ class UpdateInsertPersona:
 
     def cerrar_ventana_preguntando(self):
         if messagebox.askokcancel("Cerrar", "¿Está seguro que desea cerrar la ventana? Esto descartará los cambios."):
-            from gui.persona_gui.manage_personas_gui import PersonasGui
+            from gui.experiencia_gui.manage_experiencias_gui import ExperienciasGui
             self.ventana.destroy()
-            PersonasGui().iniciar_ventana()
+            ExperienciasGui().iniciar_ventana()
 
     def cargar_widgets(self):
-        # Id de la empresa
+        # Id
         ttk.Label(self.ventana, text="Id: ", font=self.font).grid(row=0, column=0, sticky="nsew")
         id_entry = ttk.Entry(self.ventana, textvariable=self.Id, font=self.font)
-        if self.persona is not None:
-            id_entry.insert(0, self.persona.Id)
+        if self.experiencia is not None:
+            id_entry.insert(0, self.experiencia.Id)
         id_entry.config(state="readonly")
         id_entry.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
 
-        # Correo de la empresa
-        ttk.Label(self.ventana, text="Correo: ", font=self.font).grid(row=1, column=0, sticky="nsew")
-        correo_entry = ttk.Entry(self.ventana, textvariable=self.Correo, font=self.font)
-        if self.persona is not None:
-            correo_entry.insert(0, self.persona.Correo)
-        correo_entry.grid(row=1, column=1, padx=5, pady=5)
+        # Titulo
+        ttk.Label(self.ventana, text="Título: ", font=self.font).grid(row=1, column=0, sticky="nsew")
+        titulo_entry = ttk.Entry(self.ventana, textvariable=self.Titulo, font=self.font)
+        if self.experiencia is not None:
+            titulo_entry.insert(0, self.experiencia.Titulo)
+        titulo_entry.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
 
-        # Contraseña de la empresa
-        ttk.Label(self.ventana, text="Contraseña: ", font=self.font).grid(row=2, column=0, sticky="nsew")
-        contrasena_entry = ttk.Entry(self.ventana, textvariable=self.Contrasena, font=self.font)
-        if self.persona is not None:
-            contrasena_entry.insert(0, self.persona.Contrasena)
-        contrasena_entry.grid(row=2, column=1, padx=5, pady=5)
+        # Descripcion
+        ttk.Label(self.ventana, text="Descripción: ", font=self.font).grid(row=2, column=0, sticky="nsew")
+        descripcion_entry = ttk.Entry(self.ventana, textvariable=self.Descripcion, font=self.font)
+        if self.experiencia is not None:
+            descripcion_entry.insert(0, self.experiencia.Descripcion)
+        descripcion_entry.grid(row=2, column=1, sticky="nsew", padx=5, pady=5)
 
-        # Nick de la empresa
-        ttk.Label(self.ventana, text="Nick: ", font=self.font).grid(row=3, column=0, sticky="nsew")
-        nick_entry = ttk.Entry(self.ventana, textvariable=self.Nick, font=self.font)
-        if self.persona is not None:
-            nick_entry.insert(0, self.persona.Nick)
-        nick_entry.grid(row=3, column=1, padx=5, pady=5)
+        # Fecha celebracion
+        ttk.Label(self.ventana, text="Fecha celebración: ", font=self.font).grid(row=3, column=0, sticky="nsew")
+        fecha_celebracion_entry = ttk.Entry(self.ventana, textvariable=self.Fecha_Celebracion, font=self.font)
+        if self.experiencia is not None:
+            fecha_celebracion_entry.insert(0, self.experiencia.Fecha_Celebracion)
+        fecha_celebracion_entry.grid(row=3, column=1, sticky="nsew", padx=5, pady=5)
 
-        # Telefono de la empresa
-        ttk.Label(self.ventana, text="Telefono: ", font=self.font).grid(row=4, column=0, sticky="nsew")
-        telefono_entry = ttk.Entry(self.ventana, textvariable=self.Telefono, font=self.font)
-        if self.persona is not None:
-            telefono_entry.insert(0, self.persona.Telefono)
-        telefono_entry.grid(row=4, column=1, padx=5, pady=5)
+        # Precio
+        ttk.Label(self.ventana, text="Precio: ", font=self.font).grid(row=4, column=0, sticky="nsew")
+        precio_entry = ttk.Entry(self.ventana, textvariable=self.Precio, font=self.font)
+        if self.experiencia is not None:
+            precio_entry.insert(0, self.experiencia.Precio)
+        precio_entry.grid(row=4, column=1, sticky="nsew", padx=5, pady=5)
 
-        # Frase de la empresa
-        ttk.Label(self.ventana, text="Frase: ", font=self.font).grid(row=5, column=0, sticky="nsew")
-        frase_entry = ttk.Entry(self.ventana, textvariable=self.Frase, font=self.font)
-        if self.persona is not None:
-            frase_entry.insert(0, self.persona.Frase)
-        frase_entry.grid(row=5, column=1, padx=5, pady=5)
+        # Aforo
+        ttk.Label(self.ventana, text="Aforo: ", font=self.font).grid(row=5, column=0, sticky="nsew")
+        aforo_entry = ttk.Entry(self.ventana, textvariable=self.Aforo, font=self.font)
+        if self.experiencia is not None:
+            aforo_entry.insert(0, self.experiencia.Aforo)
+        aforo_entry.grid(row=5, column=1, sticky="nsew", padx=5, pady=5)
 
-        # Nombre de la empresa
-        ttk.Label(self.ventana, text="Dni: ", font=self.font).grid(row=6, column=0, sticky="nsew")
-        nombre_empresa_entry = ttk.Entry(self.ventana, textvariable=self.Dni, font=self.font)
-        if self.persona is not None:
-            nombre_empresa_entry.insert(0, self.persona.Dni)
-        nombre_empresa_entry.grid(row=6, column=1, padx=5, pady=5)
-
-        # Cif de la empresa
-        ttk.Label(self.ventana, text="Nombre: ", font=self.font).grid(row=7, column=0, sticky="nsew")
-        cif_entry = ttk.Entry(self.ventana, textvariable=self.Nombre, font=self.font)
-        if self.persona is not None:
-            cif_entry.insert(0, self.persona.Nombre)
-        cif_entry.grid(row=7, column=1, padx=5, pady=5)
-
-        # Direccion de facturación de la empresa
-        ttk.Label(self.ventana, text="Apellido1: ", font=self.font).grid(row=8, column=0, sticky="nsew")
-        facturacion_entry = ttk.Entry(self.ventana, textvariable=self.Apellido1, font=self.font)
-        if self.persona is not None:
-            facturacion_entry.insert(0, self.persona.Apellido1)
-        facturacion_entry.grid(row=8, column=1, padx=5, pady=5)
-
-        # Dirección fiscal de la empresa
-        ttk.Label(self.ventana, text="Apellido2: ", font=self.font).grid(row=9, column=0, sticky="nsew")
-        fiscal_entry = ttk.Entry(self.ventana, textvariable=self.Apellido2, font=self.font)
-        if self.persona is not None:
-            fiscal_entry.insert(0, self.persona.Apellido2)
-        fiscal_entry.grid(row=9, column=1, padx=5, pady=5)
-
-        # Nombre de la persona fisica
-        ttk.Label(self.ventana, text="Fecha Nacimiento: ", font=self.font).grid(row=10, column=0, sticky="nsew")
-        persona_fisica = ttk.Entry(self.ventana, textvariable=self.Fecha_Nacimiento, font=self.font)
-        if self.persona is not None:
-            persona_fisica.insert(0, self.persona.Fecha_Nacimiento)
-        persona_fisica.grid(row=10, column=1, padx=5, pady=5)
+        # Id de la empresa
+        ttk.Label(self.ventana, text="Id de la empresa: ", font=self.font).grid(row=6, column=0, sticky="nsew")
+        id_empresa_entry = ttk.Entry(self.ventana, textvariable=self.Id_Empresa, font=self.font)
+        if self.experiencia is not None:
+            id_empresa_entry.insert(0, self.experiencia.Empresa.Id)
+        id_empresa_entry.grid(row=6, column=1, sticky="nsew", padx=5, pady=5)
 
         # Botón para actualizar
-        ttk.Button(self.ventana, text="Actualizar", command=self.actualizar_insertar).grid(row=14, column=0,
-                                                                                           sticky="nsew", padx=5,
-                                                                                           pady=5, columnspan=2)
+        ttk.Button(self.ventana, text="Actualizar", command=self.actualizar_insertar).grid(row=14, column=0, sticky="nsew", padx=5, pady=5, columnspan=2)
 
         self.center()
 
@@ -144,35 +107,28 @@ class UpdateInsertPersona:
     def actualizar_insertar(self):
 
         # Lo importo aqui para evitar circular imports
-        from gui.persona_gui.manage_personas_gui import PersonasGui
+        from gui.experiencia_gui.manage_experiencias_gui import ExperienciasGui
 
-        nueva_persona = Persona(
-            id=self.Id.get(),
-            correo=self.Correo.get(),
-            contrasena=self.Contrasena.get(),
-            nick=self.Nick.get(),
-            foto_perfil="",  # TODO,
-            foto_fondo="",  # TODO
-            telefono=self.Telefono.get(),
-            frase=self.Frase.get(),
-            Dni=self.Dni.get(),
-            Nombre=self.Nombre.get(),
-            Apellido1=self.Apellido1.get(),
-            Apellido2=self.Apellido2.get(),
-            Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
-            Sexo=Sexo(1, "Hombre")  # TODO
+        nueva_experiencia = Experiencia(
+            Id=None,
+            Aforo=self.Aforo.get(),
+            Descripcion=self.Descripcion.get(),
+            Fecha_Celebracion=self.Fecha_Celebracion.get(),
+            Foto=self.Foto.get(),
+            Precio=self.Precio.get(),
+            Titulo=self.Titulo.get(),
         )
 
-        if self.persona is None:
-            if wsp.insert_persona(nueva_persona):
-                messagebox.showinfo("Insertado", "Persona insertada correctamente.")
+        if self.experiencia is None:
+            if wse.insertar_experiencia(nueva_experiencia):
+                messagebox.showinfo("Insertado", "Experiencia insertada correctamente.")
                 self.ventana.destroy()
-                PersonasGui().iniciar_ventana()
+                ExperienciasGui().iniciar_ventana()
         else:
-            if wsp.update_persona(nueva_persona):
-                messagebox.showinfo("Actualizado", "Persona actualizada correctamente.")
+            if wse.actualizar_experiencia(nueva_experiencia):
+                messagebox.showinfo("Actualizado", "Experiencia actualizada correctamente.")
                 self.ventana.destroy()
-                PersonasGui().iniciar_ventana()
+                ExperienciasGui().iniciar_ventana()
 
     def iniciar_ventana(self):
         self.ventana.mainloop()
