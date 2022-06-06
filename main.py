@@ -9,4 +9,4 @@ from gui.experiencia_gui.manage_experiencias_gui import ExperienciasGui
 from gui.sexo_gui.manage_sexos import SexosGui
 from gui.log_gui.manage_logs import LogsGui
 
-EmpresasGui().iniciar_ventana()
+OpinionesGui().iniciar_ventana()

@@ -17,7 +17,8 @@ class UpdateInsertEmoji:
         self.ventana = tk.Tk()
         self.ventana.title("Actualizar/Insertar emoticono.")
         self.ventana.protocol("WM_DELETE_WINDOW", self.cerrar_ventana_preguntando)
-
+        self.ventana.resizable(False, False)
+        self.ventana.geometry("270x300")
         # Elementos que necesito
         self.emoticono_label = None
 
@@ -49,13 +50,13 @@ class UpdateInsertEmoji:
                 img = ImageTk.PhotoImage(img)
                 self.emoticono_label = tk.Label(self.ventana, image=img)
                 self.emoticono_label.image = img
-                self.emoticono_label.grid(row=0, column=0, columnspan=2, sticky="nsew")
+                self.emoticono_label.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=10, pady=10)
             except binascii.Error:
                 print("No se pudo cargar la imagen de fondo")
             except PIL.UnidentifiedImageError:
                 print("No se pudo cargar la imagen de fondo")
 
-        ttk.Button(self.ventana, text="Buscar emoticono...", command=self.obtener_imagen_de_equipo).grid(row=1, column=0, sticky="nsew")
+        ttk.Button(self.ventana, text="Buscar emoticono...", command=self.obtener_imagen_de_equipo).grid(row=1, column=0, sticky="nsew", columnspan=2, padx=20, pady=20)
 
         # Id de la empresa
         ttk.Label(self.ventana, text="Id: ", font=self.font).grid(row=2, column=0, sticky="nsew")
@@ -66,7 +67,7 @@ class UpdateInsertEmoji:
         id_entry.grid(row=2, column=1, sticky="nsew", padx=5, pady=5)
 
         # Botón para actualizar
-        ttk.Button(self.ventana, text="Actualizar", command=self.actualizar_insertar).grid(row=3, column=0, sticky="nsew", padx=5, pady=5, columnspan=2)
+        ttk.Button(self.ventana, text="Actualizar", command=self.actualizar_insertar).grid(row=3, column=0, sticky="nsew", padx=20, pady=20, columnspan=2)
         self.center()
 
     def obtener_imagen_de_equipo(self):

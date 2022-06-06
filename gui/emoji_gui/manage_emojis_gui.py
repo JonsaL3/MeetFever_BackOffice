@@ -129,11 +129,14 @@ class EmojisGui:
             # pinto el resto de sus atributos
             try:
                 ttk.Label(self.scrollable_frame, text=self.emoticonos[i].Id, font=self.font).grid(row=i + 1, column=1, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 if self.emoticonos[i].Eliminado:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
                 else:
                     ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
-
             except AttributeError:
                 print("No se pudo cargar el resto de los atributos")
 

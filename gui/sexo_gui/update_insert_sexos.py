@@ -12,6 +12,7 @@ class UpdateInsertSexo:
         self.ventana = tk.Tk()
         self.ventana.title("Actualizar/Insertar experiencia.")
         self.ventana.protocol("WM_DELETE_WINDOW", self.cerrar_ventana_preguntando)
+        self.ventana.resizable(False, False)
 
         # Datos que necesito
         self.sexo = sexo

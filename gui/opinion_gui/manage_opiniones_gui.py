@@ -12,7 +12,7 @@ class OpinionesGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar opiniones")
-        self.ventana.geometry("800x720")
+        self.ventana.geometry("860x720")
         self.center()
         self.ventana.resizable(False, False)
         self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)
@@ -99,15 +99,25 @@ class OpinionesGui:
             # pinto el resto de sus atributos
             try:
                 ttk.Label(self.scrollable_frame, text=self.opiniones[i].Id, font=self.font).grid(row=i + 1, column=0, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.opiniones[i].Descripcion[0:20], font=self.font).grid(row=i + 1, column=1, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.opiniones[i].Fecha, font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
 
+            try:
+                ttk.Label(self.scrollable_frame, text=self.opiniones[i].Descripcion[0:20], font=self.font).grid(row=i + 1, column=1, padx=5, pady=5)
+            except:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
+                ttk.Label(self.scrollable_frame, text=self.opiniones[i].Fecha, font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
+            except:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 if self.opiniones[i].Eliminado == 0:
                     ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
                 else:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
-
-            except AttributeError:
+            except:
                 print("No se pudo cargar el resto de los atributos")
 
             # Seteo sus botones:

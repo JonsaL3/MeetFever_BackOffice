@@ -11,9 +11,9 @@ class Usuario:
         self.Telefono = telefono
         self.Frase = frase
 
-    # id constructor
-    def __init__(self, id):
-        self.Id = id
+    @staticmethod
+    def usuario_factory_by_id(id_usuario: int) -> 'Usuario':
+        return Usuario(id_usuario, "", "", "", "", "", "", "")
 
     @staticmethod
     def to_dict_data(usuario: 'Usuario') -> dict:

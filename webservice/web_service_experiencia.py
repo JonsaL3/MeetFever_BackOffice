@@ -86,3 +86,18 @@ def actualizar_experiencia(experiencia: Experiencia):
         return False
     else:
         return True
+
+
+def confirmar_solicitud_borrado(id: int) -> bool:
+    dict_data = {
+        "Id": id
+    }
+    print(json.dumps(dict_data))
+
+    json_elementos = WebService(
+        "https://meetfever.eu/interface/api/meetfever/experiencia/SolicitarBorradoEperiencia").put_request_json(dict_data)
+
+    if json_elementos is None:
+        return False
+    else:
+        return True

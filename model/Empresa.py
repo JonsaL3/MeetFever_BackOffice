@@ -15,6 +15,10 @@ class Empresa(Usuario):
         self.Dni_Persona = dni_persona
 
     @staticmethod
+    def empresa_factory_by_id(id: int) -> 'Empresa':
+        return Empresa(id, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
+
+    @staticmethod
     def to_dict_data(empresa: 'Empresa') -> dict:
         dict_data = Usuario.to_dict_data(empresa)
         dict_data['Nombre_Empresa'] = empresa.Nombre_Empresa

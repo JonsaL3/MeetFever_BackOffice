@@ -17,7 +17,7 @@ class ExperienciasGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar experiencias")
-        self.ventana.geometry("1240x720")
+        self.ventana.geometry("1340x720")
         self.center()
         self.ventana.resizable(False, False)
         self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)
@@ -27,6 +27,11 @@ class ExperienciasGui:
 
         # Lista de empresas
         self.experiencias = None
+
+        # Foto por defecto
+        self.photo = tk.PhotoImage(file='assets/default_experience.png')
+        self.photo = self.photo.subsample(2, 2)
+        self.label_photo = None
 
         # Elementos internos que en cualquier lenguaje normal serían prescindibles
         self.lista_fotos_experiencia = None
@@ -96,6 +101,21 @@ class ExperienciasGui:
         self.xscrollbar.config(command=self.canvas.xview)
         self.yscrollbar.config(command=self.canvas.yview)
 
+        self.mostrar_mensaje_si_hay_desactivaciones_pendientes()
+
+    def cargar_foto_por_defecto(self, row, column, pos, lista):
+        lista.append(None)
+        self.label_photo = tk.Label(row, image=self.photo)
+        self.label_photo.config(width=50, height=50)
+        self.label_photo.photo = self.photo
+        self.label_photo.grid(column=column, row=pos + 1, padx=5, pady=5)
+
+    def mostrar_mensaje_si_hay_desactivaciones_pendientes(self):
+        for experiencia in self.experiencias:
+            if experiencia.Borrado_Solicitado:
+                messagebox.showinfo("Aviso", "Hay experiencias con solicitud de borrado. Confirmelas si lo considera.")
+                return
+
     def pintar_lista_de_personas(self):
 
         self.lista_fotos_experiencia = []
@@ -113,36 +133,56 @@ class ExperienciasGui:
         # Pinto las empresas junto a sus opciones en el scroll
         for i in range(len(self.experiencias)):
 
-            # Obtengo la foto de perfil
+            # Obtengo la foto de la experiencia
             try:
-                self.base64_string = self.experiencias[i].Foto_Perfil
+                self.base64_string = self.experiencias[i].Foto
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_fotos_experiencia.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_fotos_experiencia[i]).grid(column=0, row=i + 1, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, image=self.lista_fotos_experiencia[i]).grid(column=0, row=i + 1, padx=5, pady=5, )
             except binascii.Error:
-                print("No se pudo cargar la imagen de perfil")
-                self.lista_fotos_experiencia.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_fotos_experiencia)
             except PIL.UnidentifiedImageError:
-                print("No se pudo cargar la imagen de perfil")
-                self.lista_fotos_experiencia.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_fotos_experiencia)
             except AttributeError:
-                print("No se pudo cargar la imagen de perfil")
-                self.lista_fotos_experiencia.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_fotos_experiencia)
 
             # pinto el resto de sus atributos
             try:
                 ttk.Label(self.scrollable_frame, text=self.experiencias[i].Id, font=self.font).grid(row=i + 1, column=1, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 ttk.Label(self.scrollable_frame, text=self.experiencias[i].Titulo[0:20], font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 ttk.Label(self.scrollable_frame, text=self.experiencias[i].Descripcion[0:20], font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 ttk.Label(self.scrollable_frame, text=self.experiencias[i].Fecha_Celebracion, font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Precio, font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Aforo, font=self.font).grid(row=i + 1, column=6, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Precio, font=self.font).grid(row=i + 1,column=5,padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
+                ttk.Label(self.scrollable_frame, text=self.experiencias[i].Aforo, font=self.font).grid(row=i + 1,column=6, padx=5,pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 if self.experiencias[i].Eliminado:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=7, padx=5, pady=5)
                 else:
                     ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=7, padx=5, pady=5)
-
             except AttributeError:
                 print("No se pudo cargar el resto de los atributos")
 
@@ -165,9 +205,21 @@ class ExperienciasGui:
                 self.eliminar_persona_real(iterador)
             })
 
+            if self.experiencias[i].Borrado_Solicitado:
+                boton_confirmar_borrado_logico = ttk.Button(self.scrollable_frame, text="Confirmar")
+                boton_confirmar_borrado_logico.config(command=lambda iterador=i: {
+                    self.confirmar_borrado_logico(iterador)
+                })
+                boton_confirmar_borrado_logico.grid(row=i + 1, column=11, padx=5, pady=5)
+
     def editar_persona(self, persona):
         self.ventana.destroy()
         UpdateInsertExperiencias(persona).iniciar_ventana()
+
+    def confirmar_borrado_logico(self, iterador):
+        wse.confirmar_solicitud_borrado(self.experiencias[iterador].Id)
+        wse.delete_experiencia_by_id_logic(self.experiencias[iterador].Id)
+        self.actualizar_lista()
 
     def activar_desactivar_persona(self, iterador):
 

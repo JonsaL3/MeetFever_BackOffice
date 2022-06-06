@@ -36,6 +36,11 @@ class PersonasGui:
         self.base64_string = None
         self.image = None
 
+        # Foto por defecto
+        self.photo = tk.PhotoImage(file='assets/default_person.png')
+        self.photo = self.photo.subsample(2, 2)
+        self.label_photo = None
+
         # Elementos que la componen
         self.contenedor = None
         self.scrollable_frame = None
@@ -63,13 +68,19 @@ class PersonasGui:
         y = self.ventana.winfo_screenheight() // 2 - win_height // 2
         self.ventana.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
+    def cargar_foto_por_defecto(self, row, column, pos, lista):
+        lista.append(None)
+        self.label_photo = tk.Label(row, image=self.photo)
+        self.label_photo.config(width=50, height=50)
+        self.label_photo.photo = self.photo
+        self.label_photo.grid(column=column, row=pos + 1, padx=5, pady=5)
+
     def obtener_personas_actualizadas(self):
         self.personas: list[Persona] = wsp.get_all_personas()
         self.personas.sort(key=lambda x: x.Id)
 
     def cargar_widgets(self):
-        ttk.Button(self.ventana, text="Agregar persona", command=lambda: self.editar_persona(None)).pack(side=tk.TOP,
-                                                                                                         fill=tk.X)
+        ttk.Button(self.ventana, text="Agregar persona", command=lambda: self.editar_persona(None)).pack(side=tk.TOP, fill=tk.X)
 
         # Creo un conenedor con scroll
         self.contenedor = ttk.Frame(self.ventana)
@@ -122,17 +133,13 @@ class PersonasGui:
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_foto_perfil.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_foto_perfil[i]) \
-                    .grid(column=0, row=i + 1, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, image=self.lista_foto_perfil[i]).grid(column=0, row=i + 1, padx=5, pady=5)
             except binascii.Error:
-                print("No se pudo cargar la imagen de perfil")
-                self.lista_foto_fondo.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_foto_perfil)
             except PIL.UnidentifiedImageError:
-                print("No se pudo cargar la imagen de perfil")
-                self.lista_foto_perfil.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_foto_perfil)
             except AttributeError:
-                print("No se pudo cargar la imagen de perfil")
-                self.lista_foto_perfil.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_foto_perfil)
 
             # Obtengo la foto de fondo
             try:
@@ -140,28 +147,35 @@ class PersonasGui:
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_foto_fondo.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(self.scrollable_frame, image=self.lista_foto_fondo[i]) \
-                    .grid(column=1, row=i + 1, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
             except binascii.Error:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 1, i, self.lista_foto_fondo)
             except PIL.UnidentifiedImageError:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 1, i, self.lista_foto_fondo)
             except AttributeError:
-                print("No se pudo cargar la imagen de fondo")
-                self.lista_foto_fondo.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 1, i, self.lista_foto_fondo)
 
             # pinto el resto de sus atributos
             try:
                 ttk.Label(self.scrollable_frame, text=self.personas[i].Id, font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 ttk.Label(self.scrollable_frame, text=self.personas[i].Correo[0:20], font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 ttk.Label(self.scrollable_frame, text=self.personas[i].Nick[0:20], font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 if self.personas[i].Eliminado:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
                 else:
                     ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
-
             except AttributeError:
                 print("No se pudo cargar el resto de los atributos")
 

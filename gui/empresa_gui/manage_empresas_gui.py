@@ -11,9 +11,6 @@ from model.Empresa import Empresa
 from PIL import Image, ImageTk
 from gui.empresa_gui.update_insert_empresas import UpdateInsertEmpresa
 
-foto_empresa_por_defecto = Image.open("assets/default_enterprise.png")
-foto_empresa_por_defecto = foto_empresa_por_defecto.resize((200, 200), PIL.Image.ANTIALIAS)
-
 
 class EmpresasGui:
 
@@ -31,6 +28,11 @@ class EmpresasGui:
 
         # Lista de empresas
         self.empresas = None
+
+        # Foto por defecto
+        self.photo = tk.PhotoImage(file='assets/default_enterprise.png')
+        self.photo = self.photo.subsample(2, 2)
+        self.label_photo = None
 
         # Elementos internos que en cualquier lenguaje normal serían prescindibles
         self.lista_foto_perfil = None
@@ -99,6 +101,13 @@ class EmpresasGui:
         # las scrollbars deben verse en el mismo orden que el contenedor
         self.yscrollbar.config(command=self.canvas.yview)
 
+    def cargar_foto_por_defecto(self, row, column, pos, lista):
+        lista.append(None)
+        self.label_photo = tk.Label(row, image=self.photo)
+        self.label_photo.config(width=50, height=50)
+        self.label_photo.photo = self.photo
+        self.label_photo.grid(column=column, row=pos + 1, padx=5, pady=5)
+
     def pintar_lista_de_empresas(self):
 
         self.lista_foto_perfil = []
@@ -116,20 +125,19 @@ class EmpresasGui:
         # Pinto las empresas junto a sus opciones en el scroll
         for i in range(len(self.empresas)):
 
-            row = tk.Frame(self.scrollable_frame)
-            row.grid(row=i + 1, column=0, columnspan=7, sticky="nsew")
-
             # Obtengo la foto de perfil
             try:
                 self.base64_string = self.empresas[i].Foto_Perfil
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_foto_perfil.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(row, image=self.lista_foto_perfil[i]).grid(column=0, row=i + 1, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, image=self.lista_foto_perfil[i]).grid(column=0, row=i + 1, padx=5, pady=5)
             except binascii.Error:
-                self.lista_foto_fondo.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_foto_perfil)
             except PIL.UnidentifiedImageError:
-                self.lista_foto_perfil.append(None)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_foto_perfil)
+            except AttributeError:
+                self.cargar_foto_por_defecto(self.scrollable_frame, 0, i, self.lista_foto_perfil)
 
             # Obtengo la foto de fondo
             try:
@@ -137,27 +145,41 @@ class EmpresasGui:
                 self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
                 self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
                 self.lista_foto_fondo.append(ImageTk.PhotoImage(self.image))
-                ttk.Label(row, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
+                ttk.Label(self.scrollable_frame, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
             except binascii.Error:
-                self.lista_foto_fondo.append(foto_empresa_por_defecto)
-                ttk.Label(row, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 1, i, self.lista_foto_fondo)
             except PIL.UnidentifiedImageError:
-                self.lista_foto_fondo.append(foto_empresa_por_defecto)
-                ttk.Label(row, image=self.lista_foto_fondo[i]).grid(column=1, row=i + 1, padx=5, pady=5)
+                self.cargar_foto_por_defecto(self.scrollable_frame, 1, i, self.lista_foto_fondo)
+            except AttributeError:
+                self.cargar_foto_por_defecto(self.scrollable_frame, 1, i, self.lista_foto_perfil)
 
             # pinto el resto de sus atributos
             try:
                 # cada columna de la lista será de un color distinto
                 ttk.Label(self.scrollable_frame, text=self.empresas[i].Id, font=self.font).grid(row=i + 1, column=2, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Correo[0:20], font=self.font).grid(row=i + 1, column=3,padx=5,pady=5)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nick[0:20], font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
-                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nombre_Empresa[0:20], font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
 
+            try:
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Correo[0:20], font=self.font).grid(row=i + 1, column=3, padx=5,pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nick[0:20], font=self.font).grid(row=i + 1, column=4, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
+                ttk.Label(self.scrollable_frame, text=self.empresas[i].Nombre_Empresa[0:20], font=self.font).grid(row=i + 1, column=5, padx=5, pady=5)
+            except AttributeError:
+                print("No se pudo cargar el resto de los atributos")
+
+            try:
                 if self.empresas[i].Eliminado == 0:
-                    ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=6, padx=5,pady=5)
+                    ttk.Label(self.scrollable_frame, text="Si", font=self.font).grid(row=i + 1, column=6, padx=5, pady=5)
                 else:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=6, padx=5, pady=5)
-
             except AttributeError:
                 print("No se pudo cargar el resto de los atributos")
 
