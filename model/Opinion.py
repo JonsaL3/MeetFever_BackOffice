@@ -28,3 +28,5 @@ class Opinion:
             'Id_Experiencia': opinion.Id_Experiencia,
             'Titulo': opinion.Titulo
         }
+
+

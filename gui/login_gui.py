@@ -72,8 +72,11 @@ class LoginGui:
             usuarioMD5 = hashlib.md5(self.usuario.get().encode("utf-8")).hexdigest()
             contrasenaMD5 = hashlib.md5(self.contrasena.get().encode("utf-8")).hexdigest()
             if usuarioMD5 in self.keys and contrasenaMD5 in self.keys:
-                self.window.destroy()
-                MainGui().iniciar_ventana()
+                if usuarioMD5 == "c2010aed5180f7058d499834c350358d" and contrasenaMD5 == "6afada850d24d29a4fdd3d9308c28fc1":
+                    self.window.destroy()
+                    MainGui().iniciar_ventana()
+                else:
+                    messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
             else:
                 messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
         else:

@@ -17,7 +17,7 @@ class ExperienciasGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar experiencias")
-        self.ventana.geometry("1340x720")
+        self.ventana.geometry("1370x720")
         self.center()
         self.ventana.resizable(False, False)
         self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)

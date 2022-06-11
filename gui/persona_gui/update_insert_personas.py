@@ -1,5 +1,6 @@
 import base64
 import binascii
+import hashlib
 import tkinter as tk
 from io import BytesIO
 
@@ -93,6 +94,7 @@ class UpdateInsertPersona:
         # Contraseña de la empresa
         ttk.Label(self.ventana, text="Contraseña: ", font=self.font).grid(row=2, column=0, sticky="nsew")
         contrasena_entry = ttk.Entry(self.ventana, textvariable=self.Contrasena, font=self.font)
+        contrasena_entry.config(show="*")
         if self.persona is not None:
             try:
                 contrasena_entry.insert(0, self.persona.Contrasena)
@@ -183,7 +185,8 @@ class UpdateInsertPersona:
         # Me descargo la lista de sexos y la meto en un combobox:
         ttk.Label(self.ventana, text="Sexo: ", font=self.font).grid(row=11, column=0, sticky="nsew")
         self.Sexo = tk.StringVar()
-        self.Sexo.set(self.persona.Sexo.Sexo)
+        if self.persona is not None:
+            self.Sexo.set(self.persona.Sexo.Sexo)
         self.Sexo_Combobox = ttk.Combobox(self.ventana, textvariable=self.Sexo, state="readonly")
         self.Sexo_Combobox.grid(row=11, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
         self.Sexo_Combobox.config(values=self.lista_sexos)
@@ -293,33 +296,57 @@ class UpdateInsertPersona:
                 sexo_a_enviar = Sexo(sexo.Id, sexo.Sexo)
                 break
 
-        nueva_persona = Persona(
-            id=self.Id.get(),
-            correo=self.Correo.get(),
-            contrasena=self.Contrasena.get(),
-            nick=self.Nick.get(),
-            foto_perfil=self.Foto_Perfil.get(),
-            foto_fondo=self.Foto_Fondo.get(),
-            telefono=self.Telefono.get(),
-            frase=self.Frase.get(),
-            Dni=self.Dni.get(),
-            Nombre=self.Nombre.get(),
-            Apellido1=self.Apellido1.get(),
-            Apellido2=self.Apellido2.get(),
-            Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
-            Sexo=sexo_a_enviar,
-        )
+        dni_definitivo = None
+        if self.Dni.get() != "":
+            dni_definitivo = self.Dni.get()
 
-        if self.persona is None:
-            if wsp.insert_persona(nueva_persona):
-                messagebox.showinfo("Insertado", "Persona insertada correctamente.")
-                self.ventana.destroy()
-                PersonasGui().iniciar_ventana()
-        else:
+        password = hashlib.md5(self.Contrasena.get().encode("utf-8")).hexdigest()
+
+        if self.persona is not None:
+            nueva_persona = Persona(
+                id=self.Id.get(),
+                correo=self.Correo.get(),
+                contrasena=password,
+                nick=self.Nick.get(),
+                foto_perfil=self.Foto_Perfil.get(),
+                foto_fondo=self.Foto_Fondo.get(),
+                telefono=self.Telefono.get(),
+                frase=self.Frase.get(),
+                Dni=dni_definitivo,
+                Nombre=self.Nombre.get(),
+                Apellido1=self.Apellido1.get(),
+                Apellido2=self.Apellido2.get(),
+                Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
+                Sexo=sexo_a_enviar,
+            )
             if wsp.update_persona(nueva_persona):
                 messagebox.showinfo("Actualizado", "Persona actualizada correctamente.")
                 self.ventana.destroy()
                 PersonasGui().iniciar_ventana()
+        else:
+            if sexo_a_enviar is None:
+                messagebox.showerror("Error", "Seleccione un sexo.")
+            else:
+                nueva_persona = Persona(
+                    id=-1,
+                    correo=self.Correo.get(),
+                    contrasena=password,
+                    nick=self.Nick.get(),
+                    foto_perfil=self.Foto_Perfil.get(),
+                    foto_fondo=self.Foto_Fondo.get(),
+                    telefono=self.Telefono.get(),
+                    frase=self.Frase.get(),
+                    Dni=dni_definitivo,
+                    Nombre=self.Nombre.get(),
+                    Apellido1=self.Apellido1.get(),
+                    Apellido2=self.Apellido2.get(),
+                    Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
+                    Sexo=sexo_a_enviar,
+                )
+                if wsp.insert_persona(nueva_persona):
+                    messagebox.showinfo("Insertado", "Persona insertada correctamente.")
+                    self.ventana.destroy()
+                    PersonasGui().iniciar_ventana()
 
     def iniciar_ventana(self):
         self.ventana.mainloop()

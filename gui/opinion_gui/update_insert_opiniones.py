@@ -1,5 +1,4 @@
 import base64
-import binascii
 import tkinter as tk
 from io import BytesIO
 
@@ -11,7 +10,6 @@ import webservice.web_service_emoticono as wse
 
 from tkinter import ttk, messagebox
 
-from model.Emoticono import Emoticono
 from model.Opinion import Opinion
 
 icono_seleccionado = None
@@ -31,15 +29,16 @@ def pintar_lista_emoticonos():
         img = img.resize((50, 50), PIL.Image.ANTIALIAS)
         img = ImageTk.PhotoImage(img)
 
-        def set_icono_seleccionado(emoticono: Emoticono):
+        def set_icono_seleccionado(iterador: int):
             global icono_seleccionado
-            icono_seleccionado = emoticono
+            icono_seleccionado = emoticonos[iterador]
             ventana_emoji.destroy()
+            return
 
         # creo un boton con esa imagen
         boton = ttk.Button(ventana_emoji, image=img)
         boton.image = img
-        boton.config(command=lambda: set_icono_seleccionado(emoticonos[i]))
+        boton.config(command=lambda iterador=i: set_icono_seleccionado(iterador))
         boton.grid(row=i, column=0, padx=10, pady=10)
 
         ttk.Label(ventana_emoji, text="Emoticono " + str(emoticonos[i].Id)).grid(row=i, column=1, padx=10, pady=10)
@@ -157,8 +156,7 @@ class UpdateInsertOpinion:
             print("No se ha podido cargar la id de la experiencia")
         id_experiencia_entry.grid(row=7, column=1, sticky="nsew", padx=5, pady=5)
 
-        boton_seleccionar_emoticono = ttk.Button(self.ventana, text="Seleccionar Emoticono",
-                                                 command=lambda: pintar_lista_emoticonos())
+        boton_seleccionar_emoticono = ttk.Button(self.ventana, text="Seleccionar Emoticono", command=lambda: pintar_lista_emoticonos())
         boton_seleccionar_emoticono.grid(row=8, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
 
         # Botón para actualizar
@@ -188,26 +186,15 @@ class UpdateInsertOpinion:
         # Lo importo aqui para evitar circular imports
         from gui.opinion_gui.manage_opiniones_gui import OpinionesGui
 
-        nueva_opinion = None
-        id_autor_definitivo = None
-        id_empresa_definitivo = None
-        id_experiencia_definitivo = None
-
-        if self.Id_Autor.get() != "":
-            id_autor_definitivo = self.Id_Autor.get()
-
+        empresa_definitiva = None
         if self.Id_Empresa.get() != "":
-            id_empresa_definitivo = self.Id_Empresa.get()
+            empresa_definitiva = self.Id_Empresa.get()
 
-        if self.Id_Experiencia.get() != "":
-            id_experiencia_definitivo = self.Id_Experiencia.get()
+        experiencia_definitiva = None
+        if self.Id_Empresa.get() != "":
+            experiencia_definitiva = self.Id_Empresa.get()
 
         if self.opinion is not None:
-
-            print("ICONO SELECCIONADO", icono_seleccionado.Id)
-
-            # TODO NO TERMINA DE PILLAR EL EMOJI QUE HE SELECCIONADO AL MODIFICAR LA OPINION
-
             if icono_seleccionado is None:
                 icono_seleccionado = self.opinion.Emoticono
 
@@ -216,24 +203,34 @@ class UpdateInsertOpinion:
                 descripcion=self.Descripcion.get(),
                 fecha=self.Fecha.get(),
                 emoticono=icono_seleccionado,
-                id_autor=id_autor_definitivo,
-                id_empresa=id_empresa_definitivo,
-                id_experiencia=id_experiencia_definitivo,
+                id_autor=self.Id_Autor.get(),
+                id_empresa=empresa_definitiva,
+                id_experiencia=experiencia_definitiva,
                 titulo=self.Titulo.get(),
                 like=False,
                 numero_likes=0
             )
-
-        if self.opinion is None:
-            if wso.insert_opinion(nueva_opinion):
-                messagebox.showinfo("Insertado", "Opinión insertada correctamente.")
+            if wso.update_opinion(nueva_opinion):
+                messagebox.showinfo("Actualizado", "Opinión actualizada correctamente.")
                 self.ventana.destroy()
                 OpinionesGui().iniciar_ventana()
         else:
-            if wso.update_opinion(nueva_opinion):
-                messagebox.showinfo("Actualizado", "Persona Opinión correctamente.")
-                self.ventana.destroy()
-                OpinionesGui().iniciar_ventana()
+            if icono_seleccionado is not None:
+                if wso.insert_opinion(
+                    ide=self.Id.get(),
+                    titulo=self.Titulo.get(),
+                    descripcion=self.Descripcion.get(),
+                    fecha=self.Fecha.get(),
+                    id_autor=self.Id_Autor.get(),
+                    id_empresa=empresa_definitiva,
+                    id_experiencia=experiencia_definitiva,
+                    id_emoticono=icono_seleccionado.Id
+                ):
+                    messagebox.showinfo("Insertado", "Opinión insertada correctamente.")
+                    self.ventana.destroy()
+                    OpinionesGui().iniciar_ventana()
+            else:
+                messagebox.showerror("Error", "Debe seleccionar un icono.")
 
     def iniciar_ventana(self):
         self.ventana.mainloop()

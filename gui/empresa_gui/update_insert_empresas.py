@@ -1,5 +1,6 @@
 import base64
 import binascii
+import hashlib
 import tkinter as tk
 from io import BytesIO
 
@@ -89,6 +90,7 @@ class UpdateInsertEmpresa:
         # Contraseña de la empresa
         ttk.Label(self.ventana, text="Contraseña: ", font=self.font).grid(row=2, column=0, sticky="nsew")
         contrasena_entry = ttk.Entry(self.ventana, textvariable=self.Contrasena, font=self.font)
+        contrasena_entry.config(show="*")
         if self.empresa is not None:
             try:
                 contrasena_entry.insert(0, self.empresa.Contrasena)
@@ -321,17 +323,27 @@ class UpdateInsertEmpresa:
         # Lo importo aqui para evitar circular imports
         from gui.empresa_gui.manage_empresas_gui import EmpresasGui
 
+        nombre_empresa_definitivo = None
+        if self.Nombre_Empresa.get() != "":
+            nombre_empresa_definitivo = self.Nombre_Empresa.get()
+
+        cif_definitivo = None
+        if self.Cif.get() != "":
+            cif_definitivo = self.Cif.get()
+
+        password = hashlib.md5(self.Contrasena.get().encode("utf-8")).hexdigest()
+
         nueva_empresa = Empresa(
                     id=self.Id.get(),
                     correo=self.Correo.get(),
-                    contrasena=self.Contrasena.get(),
+                    contrasena=password,
                     nick=self.Nick.get(),
                     foto_perfil=self.Foto_Perfil.get(),
                     foto_fondo=self.Foto_Fondo.get(),
                     telefono=self.Telefono.get(),
                     frase=self.Frase.get(),
-                    nombre_empresa=self.Nombre_Empresa.get(),
-                    cif=self.Cif.get(),
+                    nombre_empresa=nombre_empresa_definitivo,
+                    cif=cif_definitivo,
                     direccion_facturacion=self.Direccion_Facturacion.get(),
                     direccion_fiscal=self.Direccion_Fiscal.get(),
                     nombre_persona=self.Nombre_Persona.get(),

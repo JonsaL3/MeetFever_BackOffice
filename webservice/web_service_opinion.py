@@ -61,8 +61,17 @@ def delete_opinion_by_id(id_opinion: int) -> bool:
         return True
 
 
-def insert_opinion(opinion: Opinion) -> bool:
-    dict_data = Opinion.to_dict_data(opinion)
+def insert_opinion(ide: str, titulo: str, descripcion: str, fecha: str, id_emoticono: str, id_autor: str, id_empresa: str, id_experiencia: str) -> bool:
+    dict_data = {
+        "Id": ide,
+        "Titulo": titulo,
+        "Descripcion": descripcion,
+        "Fecha": fecha,
+        "Id_Emoticono": id_emoticono,
+        "Id_Autor": id_autor,
+        "Id_Empresa": id_empresa,
+        "Id_Experiencia": id_experiencia
+    }
     print(json.dumps(dict_data))
 
     json_elementos = WebService(

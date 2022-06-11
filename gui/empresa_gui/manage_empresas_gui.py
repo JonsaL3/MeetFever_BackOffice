@@ -18,7 +18,7 @@ class EmpresasGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar empresas")
-        self.ventana.geometry("1170x720")
+        self.ventana.geometry("1300x720")
         self.center()
         self.ventana.resizable(False, False)
         self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)

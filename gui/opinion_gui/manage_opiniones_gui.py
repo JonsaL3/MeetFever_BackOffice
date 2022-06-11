@@ -1,4 +1,11 @@
+import base64
+import binascii
 import tkinter as tk
+from io import BytesIO
+
+import PIL
+from PIL import ImageTk, Image
+
 import webservice.web_service_opinion as wso
 
 from tkinter import ttk, messagebox
@@ -12,7 +19,7 @@ class OpinionesGui:
         # La ventana en si
         self.ventana = tk.Tk()
         self.ventana.title("Administrar opiniones")
-        self.ventana.geometry("860x720")
+        self.ventana.geometry("960x720")
         self.center()
         self.ventana.resizable(False, False)
         self.ventana.protocol("WM_DELETE_WINDOW", self.volver_a_menu)
@@ -29,6 +36,11 @@ class OpinionesGui:
         self.xscrollbar = None
         self.yscrollbar = None
         self.canvas = None
+
+        self.image = None
+        self.base64_string = None
+
+        self.lista_emojis = []
 
         # inicializo esos elementos
         self.cargar_widgets()
@@ -92,6 +104,7 @@ class OpinionesGui:
         ttk.Label(self.scrollable_frame, text="Contenido", font=self.font).grid(row=0, column=1, padx=5, pady=5)
         ttk.Label(self.scrollable_frame, text="Fecha", font=self.font).grid(row=0, column=2, padx=5, pady=5)
         ttk.Label(self.scrollable_frame, text="Activo", font=self.font).grid(row=0, column=3, padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Emoticono", font=self.font).grid(row=0, column=4, padx=5, pady=5)
 
         # Pinto las empresas junto a sus opciones en el scroll
         for i in range(len(self.opiniones)):
@@ -119,6 +132,19 @@ class OpinionesGui:
                     ttk.Label(self.scrollable_frame, text="No", font=self.font).grid(row=i + 1, column=3, padx=5, pady=5)
             except:
                 print("No se pudo cargar el resto de los atributos")
+
+            try:
+                self.base64_string = self.opiniones[i].Emoticono.Emoji
+                self.image = Image.open(BytesIO(base64.b64decode(self.base64_string)))
+                self.image = self.image.resize((50, 50), PIL.Image.ANTIALIAS)
+                self.lista_emojis.append(ImageTk.PhotoImage(self.image))
+                ttk.Label(self.scrollable_frame, image=self.lista_emojis[i]).grid(column=4, row=i + 1, padx=5, pady=5)
+            except binascii.Error:
+                print("No se puede cargar el emoji")
+            except PIL.UnidentifiedImageError:
+                print("No se puede cargar el emoji")
+            except AttributeError:
+                print("No se puede cargar el emoji")
 
             # Seteo sus botones:
             editar_empresa = ttk.Button(self.scrollable_frame, text="Editar")
@@ -155,7 +181,7 @@ class OpinionesGui:
         else:
              if messagebox.askyesno("Reactivar opinion", "¿Esta seguro que desea reactivar la opinión lógicamente? Esto afectará en cascada a los elementos que la componen..."):
                 if wso.reactivar_opinion_by_id_logic(self.opiniones[iterador].Id):
-                    messagebox.showinfo("Reactivar persona", "La opinión ha sido reactivada correctamente.")
+                    messagebox.showinfo("Reactivar opinión", "La opinión ha sido reactivada correctamente.")
                     self.actualizar_lista()
                 else:
                     messagebox.showerror("Error", "No se pudo reactivar la opinión.")

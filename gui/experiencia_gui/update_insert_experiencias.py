@@ -218,6 +218,17 @@ class UpdateInsertExperiencias:
                 Precio=self.Precio.get(),
                 Titulo=self.Titulo.get(),
             )
+        else:
+            nueva_experiencia = Experiencia(
+                Id=-1,
+                Aforo=self.Aforo.get(),
+                Descripcion=self.Descripcion.get(),
+                Fecha_Celebracion=self.Fecha_Celebracion.get(),
+                empresa=Empresa.empresa_factory_by_id(int(self.Id_Empresa.get())),
+                Foto=self.Foto.get(),
+                Precio=self.Precio.get(),
+                Titulo=self.Titulo.get(),
+            )
 
         if self.experiencia is None:
             if wse.insertar_experiencia(nueva_experiencia):
