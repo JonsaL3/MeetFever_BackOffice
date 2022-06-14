@@ -25,6 +25,8 @@ class LoginGui:
     def __init__(self):
         # la ventana asi
         self.window = Tk()
+        self.window.iconbitmap(relative_to_assets("indytek_logo.ico"))
+        self.window.title("Indytek D.I.O.S Login")
         self.window.geometry("1280x720")
         self.center()
         self.window.configure(bg="#F4F4F4")

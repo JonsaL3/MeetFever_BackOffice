@@ -1,9 +1,19 @@
 import tkinter as tk
+from pathlib import Path
+
 import webservice.web_service_logs as wsl
 
 from tkinter import ttk, messagebox
 
 from model.Log import Log
+
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
 
 
 class LogsGui:
@@ -11,6 +21,7 @@ class LogsGui:
     def __init__(self):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Administrar logs")
         self.ventana.geometry("1130x720")
         self.center()

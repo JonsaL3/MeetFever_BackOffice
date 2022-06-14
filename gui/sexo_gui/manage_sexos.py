@@ -1,9 +1,19 @@
 import tkinter as tk
+from pathlib import Path
+
 import webservice.web_service_sexo as wss
 
 from model.Sexo import Sexo
 from tkinter import ttk, messagebox
 from gui.sexo_gui.update_insert_sexos import UpdateInsertSexo
+
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
 
 
 class SexosGui:
@@ -11,6 +21,7 @@ class SexosGui:
     def __init__(self):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Administrar sexos")
         self.ventana.geometry("600x720")
         self.center()

@@ -1,5 +1,6 @@
 import binascii
 import tkinter as tk
+from pathlib import Path
 
 import PIL
 import webservice.web_service_empresa as wse
@@ -11,12 +12,21 @@ from model.Empresa import Empresa
 from PIL import Image, ImageTk
 from gui.empresa_gui.update_insert_empresas import UpdateInsertEmpresa
 
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
+
 
 class EmpresasGui:
 
     def __init__(self):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Administrar empresas")
         self.ventana.geometry("1300x720")
         self.center()

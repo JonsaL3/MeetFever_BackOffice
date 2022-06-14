@@ -2,6 +2,7 @@ import base64
 import binascii
 import tkinter as tk
 from io import BytesIO
+from pathlib import Path
 from tkinter import ttk, messagebox
 
 import PIL
@@ -11,12 +12,21 @@ import webservice.web_service_emoticono as wse
 from gui.emoji_gui.update_insert_emoji import UpdateInsertEmoji
 from model.Emoticono import Emoticono
 
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
+
 
 class EmojisGui:
 
     def __init__(self):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Administrar emoticonos")
         self.ventana.geometry("510x720")
         self.center()

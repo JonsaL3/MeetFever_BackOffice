@@ -23,6 +23,8 @@ class MainGui:
     def __init__(self):
         # La ventana en si
         self.window = Tk()
+        self.window.iconbitmap(relative_to_assets("indytek_logo.ico"))
+        self.window.title("MeetFever! Indytek D.I.O.S Administrator")
         self.window.geometry("1280x720")
         self.center()
         self.window.configure(bg="#F4F4F4")

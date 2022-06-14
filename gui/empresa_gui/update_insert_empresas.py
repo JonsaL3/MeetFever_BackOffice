@@ -3,6 +3,7 @@ import binascii
 import hashlib
 import tkinter as tk
 from io import BytesIO
+from pathlib import Path
 
 import PIL
 from PIL import Image, ImageTk
@@ -12,6 +13,14 @@ import webservice.web_service_empresa as wse
 from tkinter import ttk, messagebox, filedialog
 from model.Empresa import Empresa
 
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
+
 
 class UpdateInsertEmpresa:
 
@@ -19,6 +28,7 @@ class UpdateInsertEmpresa:
 
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Actualizar/Insertar empresa.")
         self.ventana.protocol("WM_DELETE_WINDOW", self.cerrar_ventana_preguntando)
         self.ventana.resizable(False, False)
@@ -92,10 +102,7 @@ class UpdateInsertEmpresa:
         contrasena_entry = ttk.Entry(self.ventana, textvariable=self.Contrasena, font=self.font)
         contrasena_entry.config(show="*")
         if self.empresa is not None:
-            try:
-                contrasena_entry.insert(0, self.empresa.Contrasena)
-            except AttributeError:
-                contrasena_entry.insert(0, "")
+            contrasena_entry.insert(0, "")
         contrasena_entry.grid(row=2, column=1, padx=5, pady=5)
 
         # Nick de la empresa
@@ -331,37 +338,39 @@ class UpdateInsertEmpresa:
         if self.Cif.get() != "":
             cif_definitivo = self.Cif.get()
 
-        password = hashlib.md5(self.Contrasena.get().encode("utf-8")).hexdigest()
+        if self.Contrasena.get() != "":
+            password = hashlib.md5(self.Contrasena.get().encode("utf-8")).hexdigest()
+            nueva_empresa = Empresa(
+                id=self.Id.get(),
+                correo=self.Correo.get(),
+                contrasena=password,
+                nick=self.Nick.get(),
+                foto_perfil=self.Foto_Perfil.get(),
+                foto_fondo=self.Foto_Fondo.get(),
+                telefono=self.Telefono.get(),
+                frase=self.Frase.get(),
+                nombre_empresa=nombre_empresa_definitivo,
+                cif=cif_definitivo,
+                direccion_facturacion=self.Direccion_Facturacion.get(),
+                direccion_fiscal=self.Direccion_Fiscal.get(),
+                nombre_persona=self.Nombre_Persona.get(),
+                apellido1_persona=self.Apellido1_Persona.get(),
+                apellido2_persona=self.Apellido2_Persona.get(),
+                dni_persona=self.Dni_Persona.get()
+            )
 
-        nueva_empresa = Empresa(
-                    id=self.Id.get(),
-                    correo=self.Correo.get(),
-                    contrasena=password,
-                    nick=self.Nick.get(),
-                    foto_perfil=self.Foto_Perfil.get(),
-                    foto_fondo=self.Foto_Fondo.get(),
-                    telefono=self.Telefono.get(),
-                    frase=self.Frase.get(),
-                    nombre_empresa=nombre_empresa_definitivo,
-                    cif=cif_definitivo,
-                    direccion_facturacion=self.Direccion_Facturacion.get(),
-                    direccion_fiscal=self.Direccion_Fiscal.get(),
-                    nombre_persona=self.Nombre_Persona.get(),
-                    apellido1_persona=self.Apellido1_Persona.get(),
-                    apellido2_persona=self.Apellido2_Persona.get(),
-                    dni_persona=self.Dni_Persona.get()
-                )
-
-        if self.empresa is None:
-            if wse.insert_empresa(nueva_empresa):
-                messagebox.showinfo("Insertado", "Empresa insertada correctamente.")
-                self.ventana.destroy()
-                EmpresasGui().iniciar_ventana()
+            if self.empresa is None:
+                if wse.insert_empresa(nueva_empresa):
+                    messagebox.showinfo("Insertado", "Empresa insertada correctamente.")
+                    self.ventana.destroy()
+                    EmpresasGui().iniciar_ventana()
+            else:
+                if wse.update_empresa(nueva_empresa):
+                    messagebox.showinfo("Actualizado", "Empresa actualizada correctamente.")
+                    self.ventana.destroy()
+                    EmpresasGui().iniciar_ventana()
         else:
-            if wse.update_empresa(nueva_empresa):
-                messagebox.showinfo("Actualizado", "Empresa actualizada correctamente.")
-                self.ventana.destroy()
-                EmpresasGui().iniciar_ventana()
+            messagebox.showerror("Error", "Para insertar o actualizar un registro debe de introducir de nuevo una contraseña.")
 
     def iniciar_ventana(self):
         self.ventana.mainloop()

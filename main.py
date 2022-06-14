@@ -1,2 +1,3 @@
 from gui.login_gui import LoginGui
-LoginGui().iniciar_ventana()
+from gui.main_gui import MainGui
+MainGui().iniciar_ventana()

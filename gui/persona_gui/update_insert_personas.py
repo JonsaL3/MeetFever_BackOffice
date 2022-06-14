@@ -3,6 +3,7 @@ import binascii
 import hashlib
 import tkinter as tk
 from io import BytesIO
+from pathlib import Path
 
 import PIL
 from PIL import Image, ImageTk
@@ -14,12 +15,21 @@ from tkinter import ttk, messagebox, filedialog
 from model.Persona import Persona
 from model.Sexo import Sexo
 
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
+
 
 class UpdateInsertPersona:
 
     def __init__(self, persona: Persona):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Actualizar/Insertar persona.")
         self.ventana.protocol("WM_DELETE_WINDOW", self.cerrar_ventana_preguntando)
         self.ventana.resizable(False, False)
@@ -95,11 +105,7 @@ class UpdateInsertPersona:
         ttk.Label(self.ventana, text="Contraseña: ", font=self.font).grid(row=2, column=0, sticky="nsew")
         contrasena_entry = ttk.Entry(self.ventana, textvariable=self.Contrasena, font=self.font)
         contrasena_entry.config(show="*")
-        if self.persona is not None:
-            try:
-                contrasena_entry.insert(0, self.persona.Contrasena)
-            except AttributeError:
-                contrasena_entry.insert(0, "")
+        contrasena_entry.insert(0, "")
         contrasena_entry.grid(row=2, column=1, padx=5, pady=5)
 
         # Nick de la empresa
@@ -300,35 +306,11 @@ class UpdateInsertPersona:
         if self.Dni.get() != "":
             dni_definitivo = self.Dni.get()
 
-        password = hashlib.md5(self.Contrasena.get().encode("utf-8")).hexdigest()
-
-        if self.persona is not None:
-            nueva_persona = Persona(
-                id=self.Id.get(),
-                correo=self.Correo.get(),
-                contrasena=password,
-                nick=self.Nick.get(),
-                foto_perfil=self.Foto_Perfil.get(),
-                foto_fondo=self.Foto_Fondo.get(),
-                telefono=self.Telefono.get(),
-                frase=self.Frase.get(),
-                Dni=dni_definitivo,
-                Nombre=self.Nombre.get(),
-                Apellido1=self.Apellido1.get(),
-                Apellido2=self.Apellido2.get(),
-                Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
-                Sexo=sexo_a_enviar,
-            )
-            if wsp.update_persona(nueva_persona):
-                messagebox.showinfo("Actualizado", "Persona actualizada correctamente.")
-                self.ventana.destroy()
-                PersonasGui().iniciar_ventana()
-        else:
-            if sexo_a_enviar is None:
-                messagebox.showerror("Error", "Seleccione un sexo.")
-            else:
+        if self.Contrasena.get() != "":
+            password = hashlib.md5(self.Contrasena.get().encode("utf-8")).hexdigest()
+            if self.persona is not None:
                 nueva_persona = Persona(
-                    id=-1,
+                    id=self.Id.get(),
                     correo=self.Correo.get(),
                     contrasena=password,
                     nick=self.Nick.get(),
@@ -343,10 +325,36 @@ class UpdateInsertPersona:
                     Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
                     Sexo=sexo_a_enviar,
                 )
-                if wsp.insert_persona(nueva_persona):
-                    messagebox.showinfo("Insertado", "Persona insertada correctamente.")
+                if wsp.update_persona(nueva_persona):
+                    messagebox.showinfo("Actualizado", "Persona actualizada correctamente.")
                     self.ventana.destroy()
                     PersonasGui().iniciar_ventana()
+            else:
+                if sexo_a_enviar is None:
+                    messagebox.showerror("Error", "Seleccione un sexo.")
+                else:
+                    nueva_persona = Persona(
+                        id=-1,
+                        correo=self.Correo.get(),
+                        contrasena=password,
+                        nick=self.Nick.get(),
+                        foto_perfil=self.Foto_Perfil.get(),
+                        foto_fondo=self.Foto_Fondo.get(),
+                        telefono=self.Telefono.get(),
+                        frase=self.Frase.get(),
+                        Dni=dni_definitivo,
+                        Nombre=self.Nombre.get(),
+                        Apellido1=self.Apellido1.get(),
+                        Apellido2=self.Apellido2.get(),
+                        Fecha_Nacimiento=self.Fecha_Nacimiento.get(),
+                        Sexo=sexo_a_enviar,
+                    )
+                    if wsp.insert_persona(nueva_persona):
+                        messagebox.showinfo("Insertado", "Persona insertada correctamente.")
+                        self.ventana.destroy()
+                        PersonasGui().iniciar_ventana()
+        else:
+            messagebox.showerror("Error", "Para insertar o actualizar un registro debe de introducir de nuevo una contraseña.")
 
     def iniciar_ventana(self):
         self.ventana.mainloop()

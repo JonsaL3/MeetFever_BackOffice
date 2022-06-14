@@ -2,6 +2,7 @@ import base64
 import binascii
 import tkinter as tk
 from io import BytesIO
+from pathlib import Path
 
 import PIL
 from PIL import Image, ImageTk
@@ -13,12 +14,21 @@ from tkinter import ttk, messagebox, filedialog
 from model.Empresa import Empresa
 from model.Experiencia import Experiencia
 
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
+
 
 class UpdateInsertExperiencias:
 
     def __init__(self, experiencia: Experiencia):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Actualizar/Insertar experiencia.")
         self.ventana.protocol("WM_DELETE_WINDOW", self.cerrar_ventana_preguntando)
         self.ventana.resizable(False, False)

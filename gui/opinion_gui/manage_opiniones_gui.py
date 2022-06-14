@@ -2,6 +2,7 @@ import base64
 import binascii
 import tkinter as tk
 from io import BytesIO
+from pathlib import Path
 
 import PIL
 from PIL import ImageTk, Image
@@ -12,12 +13,21 @@ from tkinter import ttk, messagebox
 from gui.opinion_gui.update_insert_opiniones import UpdateInsertOpinion
 from model.Opinion import Opinion
 
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("../../assets")
+
+
+def relative_to_assets(path: str) -> Path:
+    print(ASSETS_PATH / Path(path))
+    return ASSETS_PATH / Path(path)
+
 
 class OpinionesGui:
 
     def __init__(self):
         # La ventana en si
         self.ventana = tk.Tk()
+        self.ventana.iconbitmap(relative_to_assets("indytek_logo.ico"))
         self.ventana.title("Administrar opiniones")
         self.ventana.geometry("960x720")
         self.center()
@@ -100,6 +110,8 @@ class OpinionesGui:
 
     def pintar_lista_de_personas(self):
 
+        self.lista_emojis = []
+
         ttk.Label(self.scrollable_frame, text="Id", font=self.font).grid(row=0, column=0, padx=5, pady=5)
         ttk.Label(self.scrollable_frame, text="Contenido", font=self.font).grid(row=0, column=1, padx=5, pady=5)
         ttk.Label(self.scrollable_frame, text="Fecha", font=self.font).grid(row=0, column=2, padx=5, pady=5)
@@ -141,10 +153,13 @@ class OpinionesGui:
                 ttk.Label(self.scrollable_frame, image=self.lista_emojis[i]).grid(column=4, row=i + 1, padx=5, pady=5)
             except binascii.Error:
                 print("No se puede cargar el emoji")
+                self.lista_emojis.append(None)
             except PIL.UnidentifiedImageError:
                 print("No se puede cargar el emoji")
+                self.lista_emojis.append(None)
             except AttributeError:
                 print("No se puede cargar el emoji")
+                self.lista_emojis.append(None)
 
             # Seteo sus botones:
             editar_empresa = ttk.Button(self.scrollable_frame, text="Editar")
@@ -160,7 +175,6 @@ class OpinionesGui:
             })
 
             boton_borrar = ttk.Button(self.scrollable_frame, text="Eliminar")
-            boton_borrar.grid(row=i + 1, column=7, padx=5, pady=5)
             boton_borrar.grid(row=i + 1, column=7, padx=5, pady=5)
             boton_borrar.config(command=lambda iterador=i: {
                 self.eliminar_empresa_real(iterador)
